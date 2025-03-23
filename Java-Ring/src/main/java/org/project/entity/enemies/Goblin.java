@@ -3,12 +3,12 @@ package org.project.entity.enemies;
 import org.project.entity.Entity;
 import org.project.object.weapons.Weapon;
 
-public class Skeleton extends Enemy {
-    private boolean hasResurrected; // Tracks if resurrection has been used
+public class Goblin extends Enemy {
+    private boolean isAliveAfterResurrection; // Tracks if resurrection has been used
 
-    public Skeleton(int hp, int mp, int defense, Weapon weapon) {
+    public Goblin(int hp, int mp, int defense, Weapon weapon) {
         super(hp, mp, defense, weapon);
-        this.hasResurrected = false;
+        this.isAliveAfterResurrection = false;
     }
 
     @Override
@@ -16,33 +16,33 @@ public class Skeleton extends Enemy {
         int actualDamage = Math.max(damage - getDefense(), 1); // Apply defense reduction
         setHp(Math.max(getHp() - actualDamage, 0)); // Prevent negative HP
 
-        System.out.println("☠️ Skeleton took " + actualDamage + " damage! Remaining HP: " + getHp());
+        System.out.println("👹 Goblin took " + actualDamage + " damage! Remaining HP: " + getHp());
 
-        if (getHp() == 0 && !hasResurrected) {
+        if (!isAlive() && !isAliveAfterResurrection) {
             resurrect();
-        } else if (getHp() == 0) {
-            System.out.println("☠️ Skeleton has been defeated!");
+        } else if (!isAlive()) {
+            System.out.println("👹 Goblin has been defeated!");
         }
     }
 
     private void resurrect() {
         int revivedHp = (int) (getMaxHp() * 0.5); // Revives with 50% of max HP
         setHp(revivedHp);
-        hasResurrected = true;
-        System.out.println("☠️ Skeleton has resurrected with " + revivedHp + " HP!");
+        isAliveAfterResurrection = true;
+        System.out.println("👹 Goblin has resurrected with " + revivedHp + " HP!");
     }
 
     public void attack(Entity target) {
         if (!isAlive()) return;
 
         int damage = getWeapon().getDamage();
-        System.out.println("☠️ Skeleton attacks with " + getWeapon().getName() + " for " + damage + " damage!");
+        System.out.println("👹 Goblin attacks " + target.getClass().getSimpleName() + " with " + getWeapon().getName() + " for " + damage + " damage!");
         target.takeDamage(damage);
     }
 
     public void defend() {
         int defenseBoost = 5; // Example defense boost
-        System.out.println("☠️ Skeleton raises its shield, reducing incoming damage by " + defenseBoost);
+        System.out.println("👹 Goblin raises its arms, reducing incoming damage by " + defenseBoost);
         setDefense(getDefense() + defenseBoost);
     }
 
@@ -51,6 +51,6 @@ public class Skeleton extends Enemy {
 
         int newHp = Math.min(getHp() + amount, getMaxHp()); // Prevent overhealing
         setHp(newHp);
-        System.out.println("☠️ Skeleton heals for " + amount + " HP! Current HP: " + newHp);
+        System.out.println("👹 Goblin heals for " + amount + " HP! Current HP: " + newHp);
     }
 }
