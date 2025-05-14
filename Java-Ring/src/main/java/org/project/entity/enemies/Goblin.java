@@ -1,56 +1,81 @@
 package org.project.entity.enemies;
 
 import org.project.entity.Entity;
-import org.project.object.weapons.Weapon;
+import org.project.object.weapons.Dagger;
 
 public class Goblin extends Enemy {
-    private boolean isAliveAfterResurrection; // Tracks if resurrection has been used
+    private static final double DODGE_CHANCE = 0.25;
+    private static final int STEAL_AMOUNT = 5;
+    private boolean hasStolen = false;
 
-    public Goblin(int hp, int mp, int defense, Weapon weapon) {
-        super(hp, mp, defense, weapon);
-        this.isAliveAfterResurrection = false;
+    public Goblin(int health, int expReward, Dagger dagger) {
+        super("Goblin", health, new Dagger(), expReward);
     }
 
     @Override
-    public void takeDamage(int damage) {
-        int actualDamage = Math.max(damage - getDefense(), 1); // Apply defense reduction
-        setHp(Math.max(getHp() - actualDamage, 0)); // Prevent negative HP
+    public void gainExperience(int amount) {
+        // Enemies don't gain experience
+    }
 
-        System.out.println("👹 Goblin took " + actualDamage + " damage! Remaining HP: " + getHp());
+    @Override
+    public boolean isDefending() {
+        return super.isDefending();
+    }
 
-        if (!isAlive() && !isAliveAfterResurrection) {
-            resurrect();
-        } else if (!isAlive()) {
-            System.out.println("👹 Goblin has been defeated!");
+    @Override
+    public void healMana(int amount) {
+
+    }
+
+    @Override
+    public int getMana() {
+        return super.getMana();
+    }
+
+    @Override
+    public void takeDamage(int amount) {
+        if (Math.random() < DODGE_CHANCE) {
+            System.out.println("Goblin nimbly dodges the attack!");
+            return;
+        }
+        super.takeDamage(amount);  
+    }
+
+    @Override
+    public String getName() {
+        return "Goblin";
+    }
+
+
+
+    @Override
+    public void useSpecialAbility(Entity target) {
+        if (!hasStolen) {
+            // Goblin's dirty trick: steals HP on first special use
+            int damage = STEAL_AMOUNT + (int) (Math.random() * 5);
+            target.takeDamage(damage);
+            this.heal(damage);
+            System.out.printf("Goblin stabs %s and steals %d HP!%n",
+                    target.getName(), damage);
+            hasStolen = true;
+        } else {
+            // Regular attack if already used special
+            System.out.println("Goblin attempts another dirty trick but fails!");
+            super.attack(target);
         }
     }
 
-    private void resurrect() {
-        int revivedHp = (int) (getMaxHp() * 0.5); // Revives with 50% of max HP
-        setHp(revivedHp);
-        isAliveAfterResurrection = true;
-        System.out.println("👹 Goblin has resurrected with " + revivedHp + " HP!");
-    }
-
+    @Override
     public void attack(Entity target) {
-        if (!isAlive()) return;
-
-        int damage = getWeapon().getDamage();
-        System.out.println("👹 Goblin attacks " + target.getClass().getSimpleName() + " with " + getWeapon().getName() + " for " + damage + " damage!");
-        target.takeDamage(damage);
+        // 10% chance to use special ability randomly
+        if (Math.random() < 0.1) {
+            useSpecialAbility(target);
+        } else {
+            super.attack(target);
+        }
     }
-
-    public void defend() {
-        int defenseBoost = 5; // Example defense boost
-        System.out.println("👹 Goblin raises its arms, reducing incoming damage by " + defenseBoost);
-        setDefense(getDefense() + defenseBoost);
-    }
-
-    public void heal(int amount) {
-        if (!isAlive()) return;
-
-        int newHp = Math.min(getHp() + amount, getMaxHp()); // Prevent overhealing
-        setHp(newHp);
-        System.out.println("👹 Goblin heals for " + amount + " HP! Current HP: " + newHp);
+    @Override
+    public String getDescription() {
+        return "A sneaky goblin that fights dirty (Dodge chance: 25%)";
     }
 }

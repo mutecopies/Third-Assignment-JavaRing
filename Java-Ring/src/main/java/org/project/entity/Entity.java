@@ -1,21 +1,33 @@
 package org.project.entity;
 
 public interface Entity {
+    // Combat Core
     void attack(Entity target);
-
-    void defend();
-
+    void takeDamage(int damage);
     void heal(int health);
 
-    void fillMana(int mana);
 
-    void takeDamage(int damage);
 
-    int getMaxHP();
+    // Status methods
+    boolean isAlive();
 
-    int getMaxMP();
+    int getHealth();
+    int getMaxHealth();
 
-    /*
-    TODO: ADD OTHER REQUIRED AND BONUS METHODS
-    */
+
+    // Magic/Ability system
+    void useSpecialAbility(Entity target);
+    void defend();
+    
+    String getName();  
+
+    // Resource management
+    void gainExperience(int amount);
+    default boolean isDefending() { return false; }
+    void healMana(int amount);
+    default int getMana() { return 0; }
+    default int getMaxMana() { return 0; }
+
+    
+    String getDescription();
 }

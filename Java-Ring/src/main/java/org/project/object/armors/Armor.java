@@ -1,59 +1,67 @@
 package org.project.object.armors;
 
-public abstract class Armor {
+import org.project.object.Object;
+
+
+public abstract class Armor implements Object {
+
+    protected String name;
     private int defense;
-    private final int maxDefense;
-    private int durability;
-    private final int maxDurability;
-    private boolean isBroken;
+    protected int durability;
+    final int maxDurability;
 
-    public Armor(int defense, int durability) {
+    public Armor(String name, int defense, int durability) {
+        this.name = name;
         this.defense = defense;
-        this.maxDefense = defense;
-        this.durability = durability;
-        this.maxDurability = durability;
-        this.isBroken = false;
+        this.durability = this.maxDurability = durability;
     }
 
-    public void reduceDurability(int amount) {
-        if (isBroken) return; // Already broken, no further reduction
+    public int protect(int incomingDamage) {
+        int damageReduction = Math.min(defense, incomingDamage / 2);
+        int damageTaken = Math.max(1, incomingDamage - damageReduction);
 
-        durability -= amount;
-        if (durability <= 0) {
+        durability -= incomingDamage / 10;
+        if (durability < 0) {
             durability = 0;
-            checkBreak();
         }
+
+        return damageTaken;
     }
 
-    public void checkBreak() {
-        if (durability <= 0) {
-            isBroken = true;
-            defense = 0;
-            System.out.println("⚠️ Armor has broken and provides no defense!");
-        }
-    }
 
+    @Override
     public void repair() {
-        if (!isBroken) {
-            System.out.println("🔧 Armor is not broken, no repair needed!");
-            return;
-        }
-
-        System.out.println("🔧 Repairing armor...");
         durability = maxDurability;
-        defense = maxDefense;
-        isBroken = false;
+        System.out.println(name + " has been repaired!");
     }
 
-    public int getDefense() {
-        return defense;
+    @Override
+    public boolean isBroken() {
+        return durability <= 0;
+    }
+
+    // Standard getters
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getDescription() {
+        return String.format("%s (%d DEF)", name, defense);
+    }
+
+    @Override
+    public boolean isConsumable() {
+        return false;
+    }
+
+    @Override
+    public int getValue() {
+        return defense * 12;
     }
 
     public int getDurability() {
         return durability;
-    }
-
-    public boolean isBroken() {
-        return isBroken;
     }
 }

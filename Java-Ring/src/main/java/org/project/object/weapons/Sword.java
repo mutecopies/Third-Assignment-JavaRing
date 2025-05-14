@@ -1,39 +1,42 @@
 package org.project.object.weapons;
 
-import org.project.entity.Entity;
 import java.util.List;
 
-public class Sword extends Weapon {
-    private int abilityCharge; // Tracks special ability usage
+import org.project.entity.Entity;
 
-    public Sword(String name, int damage) {
-        super(name, damage);
+
+public class Sword extends Weapon {
+
+    int abilityCharge;
+
+    public Sword() {
+        super("Stell Sword" , 25 , 15, 100);
         this.abilityCharge = 0;
     }
 
+
+  
     @Override
-    public void attack(Entity target) {
-        System.out.println("⚔️ " + getName() + " slashes " + target.getClass().getSimpleName() + " for " + getDamage() + " damage!");
-        target.takeDamage(getDamage());
-        abilityCharge++; // Increases ability charge with each attack
+    public void specialAbility(List<Entity> targets) {
+        if (abilityCharge >= 3) {
+            System.out.println("Executing Whirlwind Slash!");
+            for (Entity target : targets) {
+                target.takeDamage(baseDamage * 2);
+            }
+            abilityCharge = 0;
+        } else {
+            System.out.printf("Need %d more attacks to charge!\n", 3 - abilityCharge);
+        }
     }
-
-    // Unique ability: Cleave Attack - Damages all enemies in range
-    public void uniqueAbility(List<Entity> targets) {
+    @Override
+    public void use(Entity target) {
+        super.use(target);
+        gainCharge();
+    }
+    private void gainCharge() {
         if (abilityCharge < 3) {
-            System.out.println("⚡ Sword's Cleave ability is not fully charged yet! (" + abilityCharge + "/3)");
-            return;
+            abilityCharge++;
         }
-
-        System.out.println("⚡ " + getName() + " unleashes a Cleave Attack, hitting all enemies!");
-        for (Entity target : targets) {
-            System.out.println("🩸 " + target.getClass().getSimpleName() + " takes " + getDamage() + " damage!");
-            target.takeDamage(getDamage());
-        }
-        abilityCharge = 0; // Resets charge after use
     }
-
-    public int getAbilityCharge() {
-        return abilityCharge;
-    }
+    
 }
